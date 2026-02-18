@@ -4,21 +4,6 @@ locals {
     ${yamlencode({
   write_files = [
     {
-      path        = "/etc/systemd/system/duckdns.service"
-      permissions = "0644"
-      owner       = "root"
-      content     = <<-EOT1
-                [Unit]
-                Description=Start DuckDNS
-
-                [Service]
-                ExecStart=/usr/bin/docker run --rm -e SUBDOMAINS=${var.duckdns_subdomains} -e TOKEN=${var.duckdns_token} --name=duckdns lscr.io/linuxserver/duckdns:latest
-
-                ExecStop=/usr/bin/docker stop duckdns
-                ExecStopPost=/usr/bin/docker rm duckdns
-                EOT1
-    },
-    {
       path        = "/etc/systemd/system/caddy.service"
       permissions = "0644"
       owner       = "root"
@@ -27,7 +12,7 @@ locals {
               Description=Start Caddy
 
               [Service]
-              ExecStart=/usr/bin/docker run --rm --network custom-bridge -p 443:443 --mount 'type=bind,source=/mnt/disks/data/caddy/Caddyfile,target=/etc/caddy/Caddyfile,readonly' --mount 'type=bind,source=/mnt/disks/data/caddy/data,target=/data' --mount 'type=bind,source=/mnt/disks/data/caddy/config,target=/config' --name=caddy caddy:alpine
+              ExecStart=/usr/bin/docker run --rm --network custom-bridge -p 443:443 -p 80:80 --mount 'type=bind,source=/mnt/disks/data/caddy/Caddyfile,target=/etc/caddy/Caddyfile,readonly' --mount 'type=bind,source=/mnt/disks/data/caddy/data,target=/data' --mount 'type=bind,source=/mnt/disks/data/caddy/config,target=/config' --name=caddy caddy:alpine
               ExecStop=/usr/bin/docker stop caddy
               ExecStopPost=/usr/bin/docker rm caddy
               EOT2
@@ -80,8 +65,7 @@ locals {
     "docker network create custom-bridge",
     "systemctl daemon-reload",
     "systemctl start caddy.service",
-    "systemctl start actual.service",
-    "systemctl start duckdns.service"
+    "systemctl start actual.service"
   ]
 
   bootcmd = [

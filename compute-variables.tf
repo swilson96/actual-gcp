@@ -8,16 +8,6 @@ variable "container_host_network_tags" {
   description = "List of network tags to add for firewall rules"
 }
 
-variable "duckdns_subdomains" {
-  type        = string
-  description = "Comma-delimited list of DuckDNS subdomains"
-}
-
-variable "duckdns_token" {
-  type        = string
-  description = "Authentication token for DuckDNS"
-}
-
 variable "public_key_path" {
   type    = string
   default = "~/.ssh/id_gcp_ed25519.pub"
