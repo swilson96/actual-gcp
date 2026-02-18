@@ -65,3 +65,33 @@ resource "google_compute_instance" "container_host" {
     scopes = ["cloud-platform"]
   }
 }
+
+resource "google_compute_resource_policy" "data_disk_backup" {
+  name   = "data-disk-daily-backup"
+  region = var.gcp_region
+
+  snapshot_schedule_policy {
+    schedule {
+      daily_schedule {
+        days_in_cycle = 1
+        start_time    = "03:00"
+      }
+    }
+    retention_policy {
+      max_retention_days    = 7
+      on_source_disk_delete = "KEEP_AUTO_SNAPSHOTS"
+    }
+    snapshot_properties {
+      storage_locations = [var.gcp_region]
+      labels = {
+        managed_by = "terraform"
+      }
+    }
+  }
+}
+
+resource "google_compute_disk_resource_policy_attachment" "data_disk_backup" {
+  name = google_compute_resource_policy.data_disk_backup.name
+  disk = google_compute_disk.container_host_data_disk.name
+  zone = var.gcp_zone
+}
