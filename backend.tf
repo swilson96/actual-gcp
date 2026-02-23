@@ -1,7 +1,7 @@
 terraform {
   cloud {
 
-    organization = "actual-budget-emmaandsimon"
+    organization = "swilson"
 
     workspaces {
       name = "actual-budget-emmaandsimon"
